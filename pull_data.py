@@ -8,6 +8,8 @@ import pandas as pd
 loginURL = 'https://www.kaggle.com/account/login'
 train_url = "https://www.kaggle.com/c/titanic/download/train.csv"
 test_url = "https://www.kaggle.com/c/titanic/download/test.csv"
+#make logger a global variable
+logger = logging.getLogger('hw2Logger')
 
 def get_credentials():
     """

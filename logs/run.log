@@ -1,2 +1,17 @@
-2018-09-28 14:01:21,260 - hw2Logger - INFO - load training file
-2018-09-28 14:01:21,260 - hw2Logger - INFO - clean data
+2018-10-01 15:27:22,090 - hw2Logger - INFO - Load test file and clean data
+2018-10-01 15:27:22,096 - hw2Logger - INFO - /home/grandocu/Documents/Masters/DATA622/HW2/hw2/test_data.csv read
+2018-10-01 15:27:22,098 - hw2Logger - INFO - Load model
+2018-10-01 15:27:22,111 - hw2Logger - INFO - Test model
+2018-10-01 15:27:22,145 - hw2Logger - INFO - Predictions completed
+2018-10-01 15:27:22,148 - hw2Logger - INFO - load training file and clean
+2018-10-01 15:27:22,154 - hw2Logger - INFO - /home/grandocu/Documents/Masters/DATA622/HW2/hw2/train_data.csv read
+2018-10-01 15:27:22,202 - hw2Logger - INFO - Classification report for test data 
+               precision    recall  f1-score   support
+
+           0       0.81      0.95      0.87       549
+           1       0.89      0.64      0.74       342
+
+   micro avg       0.83      0.83      0.83       891
+   macro avg       0.85      0.80      0.81       891
+weighted avg       0.84      0.83      0.82       891
+
