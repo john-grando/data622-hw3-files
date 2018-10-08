@@ -1,17 +1,10 @@
-2018-10-01 15:27:22,090 - hw2Logger - INFO - Load test file and clean data
-2018-10-01 15:27:22,096 - hw2Logger - INFO - /home/grandocu/Documents/Masters/DATA622/HW2/hw2/test_data.csv read
-2018-10-01 15:27:22,098 - hw2Logger - INFO - Load model
-2018-10-01 15:27:22,111 - hw2Logger - INFO - Test model
-2018-10-01 15:27:22,145 - hw2Logger - INFO - Predictions completed
-2018-10-01 15:27:22,148 - hw2Logger - INFO - load training file and clean
-2018-10-01 15:27:22,154 - hw2Logger - INFO - /home/grandocu/Documents/Masters/DATA622/HW2/hw2/train_data.csv read
-2018-10-01 15:27:22,202 - hw2Logger - INFO - Classification report for test data 
-               precision    recall  f1-score   support
-
-           0       0.81      0.95      0.87       549
-           1       0.89      0.64      0.74       342
-
-   micro avg       0.83      0.83      0.83       891
-   macro avg       0.85      0.80      0.81       891
-weighted avg       0.84      0.83      0.82       891
-
+2018-10-03 10:52:42,931 - hw2Logger - INFO - load training file and clean
+2018-10-03 10:52:42,938 - hw2Logger - INFO - /home/grandocu/Documents/Masters/DATA622/HW2/hw2/train_data.csv read
+2018-10-03 10:52:42,941 - hw2Logger - INFO - Create RandomForest model
+2018-10-03 10:52:42,942 - hw2Logger - DEBUG - Categorical transformation performed for ['Pclass', 'Sex', 'Cabin', 'Embarked']
+2018-10-03 10:52:42,942 - hw2Logger - DEBUG - Numeric transformation performed for ['Age', 'SibSp', 'Parch', 'Fare']
+2018-10-03 10:55:40,046 - hw2Logger - INFO - Best cross-validation accuracy: 0.84
+2018-10-03 10:55:40,084 - hw2Logger - INFO - Test set score: 0.79
+2018-10-03 10:55:40,084 - hw2Logger - INFO - Best parameters: {'rfc__max_depth': 10, 'rfc__n_estimators': 250}
+2018-10-03 10:55:43,174 - hw2Logger - INFO - Model training score: 0.888
+2018-10-03 10:55:43,174 - hw2Logger - INFO - Model test score: 0.795 

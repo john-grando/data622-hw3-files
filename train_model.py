@@ -4,12 +4,13 @@
 
 import os, sys, logging, logging.config, pickle
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import classification_report
 
 #make logger a global variable
@@ -87,7 +88,7 @@ def data_preprocess(X):
     logging.info("Training data transformation complete")
     return ct
 
-def create_randomforest(X, y):
+def create_randomforest(X, y, grid_search=None):
     """
     Create random forest model and save to file
     """
@@ -108,9 +109,32 @@ def create_randomforest(X, y):
     try:
         #Run data through pipeline and create model
         rf_pipe = Pipeline([('transform', ct),
-                            ('process', RandomForestClassifier(n_estimators=200,
-                                                          max_depth=4,
+                            ('rfc', RandomForestClassifier(n_estimators=1500,
+                                                          max_depth=8,
                                                           random_state = 345))])
+        if grid_search is not None:
+            try:
+                param_grid = {'rfc__n_estimators' : [10, 50, 100, 250, 500, 750, 1000],
+                              'rfc__max_depth' : [2, 4, 6, 8, 10, 12, 14, 16, 20]}
+                grid = GridSearchCV(rf_pipe, 
+                                    param_grid=param_grid,
+                                    cv=5)
+                grid.fit(X_train, y_train)
+                logger.info("Best cross-validation accuracy: {:.2f}".format(grid.best_score_))
+                logger.info("Test set score: {:.2f}".format(grid.score(X_test, y_test)))
+                logger.info("Best parameters: {}".format(grid.best_params_))
+                plt.matshow(grid.cv_results_['mean_test_score'].reshape(len(param_grid['rfc__max_depth']), -1),
+                            vmin=min(grid.cv_results_['mean_test_score']), cmap="viridis")
+                plt.xlabel("rfc__n_estimators")
+                plt.ylabel("rfc__max_depth")
+                plt.xticks(range(len(param_grid['rfc__n_estimators'])), 
+                           param_grid['rfc__n_estimators'])
+                plt.yticks(range(len(param_grid['rfc__max_depth'])),
+                           param_grid['rfc__max_depth'])
+                plt.colorbar()
+                plt.savefig('grid_search_cv.png', bbox_inches='tight')
+            except:
+                logger.error("Grid search failed, program proceeding")
         rf_pipe.fit(X_train, y_train)
         #get scores
         train_score = rf_pipe.score(X_train, y_train)
@@ -135,7 +159,7 @@ def main():
         logger.info("load training file and clean")
         X_clean, y = data_clean(file_loc, train_data=True)
         logger.info("Create RandomForest model")
-        train_score, test_score, _ = create_randomforest(X_clean, y)
+        train_score, test_score, _ = create_randomforest(X_clean, y, grid_search=False)
         logger.info("Model training score: %s", round(train_score, 3))
         logger.info("Model test score: %s ", round(test_score, 3))
     else:
