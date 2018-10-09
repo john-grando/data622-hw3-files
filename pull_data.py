@@ -75,7 +75,7 @@ def main():
         logger.info("download test file")
         get_kaggle_data(test_url, get_credentials(), 'test_data.csv')
     else:
-        print("The credentials.txt file is missing, please add it in the HiddenFiles folder as UserName,Password")
+        logger.error("The credentials.txt file is missing, please add it in the HiddenFiles folder as UserName,Password")
         sys.exit()
     return
 
