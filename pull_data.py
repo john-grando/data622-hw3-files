@@ -67,7 +67,9 @@ def main():
     """
     Get training and test files from the titanic dataset at kaggle.com
     """
-    if os.path.isfile(os.path.join(os.getcwd(), "HiddenFiles", "credentials.txt")):
+    if os.path.isfile(os.path.join(os.getcwd(), 'train_data.csv')) and os.path.isfile(os.path.join(os.getcwd(), 'test_data.csv')):
+        logger.info("files already downloaded, nothing downloaded")
+    elif os.path.isfile(os.path.join(os.getcwd(), "HiddenFiles", "credentials.txt")):
         logger.info("download training file")
         get_kaggle_data(train_url, get_credentials(), 'train_data.csv')
         logger.info("download test file")
