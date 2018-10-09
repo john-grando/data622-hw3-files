@@ -1,2 +1,10 @@
-2018-10-09 10:01:59,126 - hw2Logger - INFO - download training file
-2018-10-09 10:02:03,123 - hw2Logger - INFO - download test file
+2018-10-09 15:45:45,478 - hw2Logger - INFO - load training file and clean
+2018-10-09 15:45:45,488 - hw2Logger - INFO - /home/grandocu/Documents/Masters/DATA622/HW2/hw2/train_data.csv read
+2018-10-09 15:45:45,491 - hw2Logger - INFO - Create RandomForest model
+2018-10-09 15:45:45,492 - hw2Logger - DEBUG - Categorical transformation performed for ['Pclass', 'Sex', 'Cabin', 'Embarked']
+2018-10-09 15:45:45,492 - hw2Logger - DEBUG - Numeric transformation performed for ['Age', 'SibSp', 'Parch', 'Fare']
+2018-10-09 15:51:58,060 - hw2Logger - INFO - Best cross-validation accuracy: 0.83
+2018-10-09 15:51:58,071 - hw2Logger - INFO - Test set score: 0.81
+2018-10-09 15:51:58,071 - hw2Logger - INFO - Best parameters: {'rfc__max_depth': 8, 'rfc__n_estimators': 50}
+2018-10-09 15:51:59,245 - hw2Logger - INFO - Model training score: 0.947
+2018-10-09 15:51:59,245 - hw2Logger - INFO - Model test score: 0.813 

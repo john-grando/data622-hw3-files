@@ -109,8 +109,8 @@ def create_randomforest(X, y, grid_search=None):
     try:
         #Run data through pipeline and create model
         rf_pipe = Pipeline([('transform', ct),
-                            ('rfc', RandomForestClassifier(n_estimators=1500,
-                                                          max_depth=8,
+                            ('rfc', RandomForestClassifier(n_estimators=100,
+                                                          max_depth=12,
                                                           random_state = 345))])
         if grid_search is not None:
             try:
@@ -118,7 +118,7 @@ def create_randomforest(X, y, grid_search=None):
                               'rfc__max_depth' : [2, 4, 6, 8, 10, 12, 14, 16, 20]}
                 grid = GridSearchCV(rf_pipe, 
                                     param_grid=param_grid,
-                                    cv=5)
+                                    cv=10)
                 grid.fit(X_train, y_train)
                 logger.info("Best cross-validation accuracy: {:.2f}".format(grid.best_score_))
                 logger.info("Test set score: {:.2f}".format(grid.score(X_test, y_test)))
@@ -159,7 +159,7 @@ def main():
         logger.info("load training file and clean")
         X_clean, y = data_clean(file_loc, train_data=True)
         logger.info("Create RandomForest model")
-        train_score, test_score, _ = create_randomforest(X_clean, y, grid_search=False)
+        train_score, test_score, _ = create_randomforest(X_clean, y, grid_search=True)
         logger.info("Model training score: %s", round(train_score, 3))
         logger.info("Model test score: %s ", round(test_score, 3))
     else:
