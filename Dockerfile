@@ -11,7 +11,7 @@ WORKDIR /usr/src/app/hw2
 RUN git checkout working
 COPY requirements.txt ./
 #Required credential file, if it's missing then continue and just let the program spit out the error
-COPY HiddenFiles/credentials.txt ./HiddenFiles/credentials.txt; exit 0
+COPY HiddenFiles/credentials.txt ./HiddenFiles/credentials.txt
 RUN pip install --no-cache-dir -r requirements.txt
 RUN python /usr/src/app/hw2/pull_data.py
 RUN python /usr/src/app/hw2/train_model.py
