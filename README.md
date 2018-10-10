@@ -58,11 +58,11 @@ When this is called using python score_model.py in the command line, this will i
 
 3. Critical Thinking (2 points total)
 Modify this ReadMe file to answer the following questions directly in place.  
-  1) Kaggle changes links/ file locations/login process/ file content  
+   1) Kaggle changes links/ file locations/login process/ file content  
 
-    The current code provided in this homework uses the direct links provided, as requested.  However, kaggle does have an [API](https://www.kaggle.com/docs/api) which allows users to make requests in a formatted manner.  This is a much more reliable solution to solving issues with authentication and file location references.  Also, we could create an s3 instance and make an automated script (e.g. via cron) where we check the link and update the file on a recurring basis if it has changed or have it notify us if the link no longer works.  As always, it's best to test the download to make sure the link worked and throw an error if something unexpected happened.  
+      The current code provided in this homework uses the direct links provided, as requested.  However, kaggle does have an [API](https://www.kaggle.com/docs/api) which allows users to make requests in a formatted manner.  This is a much more reliable solution to solving issues with authentication and file location references.  Also, we could create an s3 instance and make an automated script (e.g. via cron) where we check the link and update the file on a recurring basis if it has changed or have it notify us if the link no longer works.  As always, it's best to test the download to make sure the link worked and throw an error if something unexpected happened.  
 
-  2) We run out of space on HD / local permissions issue - can't save files  
+   2) We run out of space on HD / local permissions issue - can't save files  
 
     We could read the files via a temporary file; however, that might not be the best solution.  If we want to keep a hardcopy somewhere, we could use amazon's s3 service (again) and just read the stored file [directly](https://stackoverflow.com/questions/46943166/python-how-to-read-csv-file-retrieved-from-s3-bucket?rq=1) into memory.  This way, we do not need to save the file to the local directory to avoid both the space and permission issue.  Also, from the reading (Agile Data Science 2.0) this would be a good way to set up a data pipeline where we have a centralized storage that can be accessed from multiple remote machines.  
 
