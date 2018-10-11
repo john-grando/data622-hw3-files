@@ -16,6 +16,3 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN python /usr/src/app/hw2/pull_data.py
 RUN python /usr/src/app/hw2/train_model.py
 RUN python /usr/src/app/hw2/score_model.py
-RUN git add .
-RUN git commit -m "auto commit on `date +'%Y-%m-%d %H:%M:%S'`"
-RUN git push origin working
