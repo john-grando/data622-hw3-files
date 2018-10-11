@@ -1,2 +1,3 @@
 HiddenFiles/*
 .ipynb_checkpoints/
+*.pyc

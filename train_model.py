@@ -157,7 +157,7 @@ def main():
     file_loc = os.path.join(os.getcwd(), "train_data.csv")
     if os.path.isfile(file_loc):
         logger.info("load training file and clean")
-        X_clean, y = data_clean(file_loc, train_data=True)
+        X_clean, y = data_clean(file_loc, train_data=None)
         logger.info("Create RandomForest model")
         train_score, test_score, _ = create_randomforest(X_clean, y, grid_search=True)
         logger.info("Model training score: %s", round(train_score, 3))
