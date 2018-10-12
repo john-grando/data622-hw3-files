@@ -15,3 +15,4 @@
    macro avg       0.90      0.88      0.89       891
 weighted avg       0.90      0.90      0.90       891
 
+2018-10-11 15:29:55,073 - hw2Logger - INFO - files already downloaded, nothing downloaded
