@@ -29,7 +29,7 @@ def data_clean(file_loc, train_data = None):
         logger.error("%s could not be read", file_loc)
     logger.info("%s read", file_loc)
     try:
-        if train_data is not None:
+        if train_data==True:
             #Get response values for testing
             y = X.pop('Survived').values
     except:
@@ -112,7 +112,7 @@ def create_randomforest(X, y, grid_search=None):
                             ('rfc', RandomForestClassifier(n_estimators=100,
                                                           max_depth=12,
                                                           random_state = 345))])
-        if grid_search is not None:
+        if grid_search==True:
             try:
                 param_grid = {'rfc__n_estimators' : [10, 50, 100, 250, 500, 750, 1000],
                               'rfc__max_depth' : [2, 4, 6, 8, 10, 12, 14, 16, 20]}
@@ -157,9 +157,9 @@ def main():
     file_loc = os.path.join(os.getcwd(), "train_data.csv")
     if os.path.isfile(file_loc):
         logger.info("load training file and clean")
-        X_clean, y = data_clean(file_loc, train_data=None)
+        X_clean, y = data_clean(file_loc, train_data=True)
         logger.info("Create RandomForest model")
-        train_score, test_score, _ = create_randomforest(X_clean, y, grid_search=True)
+        train_score, test_score, _ = create_randomforest(X_clean, y, grid_search=False)
         logger.info("Model training score: %s", round(train_score, 3))
         logger.info("Model test score: %s ", round(test_score, 3))
     else:
