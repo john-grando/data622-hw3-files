@@ -29,7 +29,7 @@ def data_clean(file_loc, train_data = None):
         logger.error("%s could not be read", file_loc)
     logger.info("%s read", file_loc)
     try:
-        if train_data==True:
+        if train_data:
             #Get response values for testing
             y = X.pop('Survived').values
     except:
@@ -112,7 +112,7 @@ def create_randomforest(X, y, grid_search=None):
                             ('rfc', RandomForestClassifier(n_estimators=100,
                                                           max_depth=12,
                                                           random_state = 345))])
-        if grid_search==True:
+        if grid_search:
             try:
                 param_grid = {'rfc__n_estimators' : [10, 50, 100, 250, 500, 750, 1000],
                               'rfc__max_depth' : [2, 4, 6, 8, 10, 12, 14, 16, 20]}

@@ -66,7 +66,8 @@ def get_predictions(file_loc, model_file_loc):
         sys.exit(1)
     try:
         #Save predictions to csv file
-        pd.DataFrame(predictions).to_csv("Predictions.csv", index=False)
+        input_df = pd.read_csv(file_loc)
+        pd.DataFrame(pd.concat([input_df['PassengerId'], pd.DataFrame(predictions)], axis=1, ignore_index=True)).rename(index=str, columns={0:'PassengerId', 1:'Survived'}).to_csv("Predictions.csv", index=False)
     except:
         logger.error("Unable to write predictions, program continuing")
     return predictions, model
