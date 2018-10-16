@@ -27,39 +27,41 @@ Instructions:
 
 More details:
 
-requirements.txt (1 point)
+requirements.txt (1 point)  
 This file documents all dependencies needed on top of the existing packages in the Docker Dataquest image from HW1. When called upon using pip install -r requirements.txt , this will install all python packages needed to run the .py files. (hint: use pip freeze to generate the .txt file)
 
-pull_data.py (5 points)
+pull_data.py (5 points)  
 When this is called using python pull_data.py in the command line, this will go to the 2 Kaggle urls provided below, authenticate using your own Kaggle sign on, pull the two datasets, and save as .csv files in the current local directory. The authentication login details (aka secrets) need to be in a hidden folder (hint: use .gitignore). There must be a data check step to ensure the data has been pulled correctly and clear commenting and documentation for each step inside the .py file.
 	Training dataset url: https://www.kaggle.com/c/titanic/download/train.csv
 	Scoring dataset url: https://www.kaggle.com/c/titanic/download/test.csv
 
-train_model.py (5 points)
+train_model.py (5 points)  
 When this is called using python train_model.py in the command line, this will take in the training dataset csv, perform the necessary data cleaning and imputation, and fit a classification model to the dependent Y. There must be data check steps and clear commenting for each step inside the .py file. The output for running this file is the random forest model saved as a .pkl file in the local directory. Remember that the thought process and decision for why you chose the final model must be clearly documented in this section.
-eda.ipynb (0 points)
+eda.ipynb (0 points)  
 
-[Optional] This supplements the commenting inside train_model.py. This is the place to provide scratch work and plots to convince me why you did certain data imputations and manipulations inside the train_model.py file.
+[Optional] This supplements the commenting inside train_model.py. This is the place to provide scratch work and plots to convince me why you did certain data imputations and manipulations inside the train_model.py file.  
 
 ### Response
 
-This script uses built-in transformations on the input data using a Pipeline() after a few custom transformations.  Through additional research, I found that there is a way to build custom transformation functions, which means that it might be possible to put everything in the Pipeline object; however, this operation seems a little complex for the task at hand and further testing/research is required for me to implement it.  The reason for the custom operations is to remove the target values from the training data, remove columns we do not wish to analyze, and propery format columns that were misread in the csv import.  For a fully integrated solution, we could, and definitely should, create a custom transformation function to be inserted into the Pipeline [itself](https://bradzzz.gitbooks.io/ga-seattle-dsi/dsi/dsi_05_classification_databases/2.2-lesson/readme.html), but for the purposes of this assignment, i've just applied it before each run into the Pipeline().
+This script uses built-in transformations on the input data using a Pipeline() after a few custom transformations.  Through additional research, I found that there is a way to build custom transformation functions, which means that it might be possible to put everything in the Pipeline object; however, this operation seems a little complex for the task at hand and further testing/research is required for me to implement it.  The reason for the custom operations is to remove the target values from the training data, remove columns we do not wish to analyze, and propery format columns that were misread in the csv import.  For a fully integrated solution, we could, and definitely should, create a custom transformation function to be inserted into the Pipeline [itself](https://bradzzz.gitbooks.io/ga-seattle-dsi/dsi/dsi_05_classification_databases/2.2-lesson/readme.html), but for the purposes of this assignment, i've just applied it before each run into the Pipeline().  
 
-After the transformations have been completed, the data is split between numerical and categorical columns and the preproccessed.  Numerical data simply has missing values imputed while categorical data is imputed and also transformed into multiple columns for each category type using OneHotEncoder().
+After the transformations have been completed, the data is split between numerical and categorical columns and the preproccessed.  Numerical data simply has missing values imputed while categorical data is imputed and also transformed into multiple columns for each category type using OneHotEncoder().  
 
-After pre-processing, the random forest model is trained.  In this section I added an option to test and display the results of some hyperparameter options from a grid search.  Below is the result from the last run (Note, the cross validation is randomized so there will be some variation from the actual hyperparameters selected):
+After pre-processing, the random forest model is trained.  In this section I added an option to test and display the results of some hyperparameter options from a grid search.  Below is the result from the last run (Note, the cross validation is randomized so there will be some variation from the actual hyperparameters selected):  
 
 ![grid search results](grid_search_cv.png)
 
-The model is then fit to the training data and saved as a pickle file.  Note, the best parameters are not fed into the model, these are manually entered so that we can ensure to see them before implementing.
+The model is then fit to the training data and saved as a pickle file.  Note, the best parameters are not fed into the model, these are manually entered so that we can ensure to see them before implementing.  
+
+This entire process (pull, train, score) can be run in a docker container by just entering ```docker build -t [TAG_NAME] .``` and then entering the image via shell.  Note, there are limitations in this process due to the fact that we are trying to download local copies of the training and test data.  In future weeks we will alleviate this issue by referencing a remote repository with files kept in a cloud storage.  
 
 Additional Notes:  
 In order to pull the training data, the user has to enter a credentials file in the HiddenFiles/ directory called credentials.txt.  However, for this homework, I have included the .csv file in the github repository so if it is present in the main directory then the program will not attempt to re-pull the data.  This is also good because it avoids unnecessarily pinging kaggle.com and requesting data files that are already present.  For future versions, we will make a centralized repository to pull this information from so that we do not need to download it every time.  
 
-score_model.py (2 points)
+score_model.py (2 points)  
 When this is called using python score_model.py in the command line, this will ingest the .pkl random forest file and apply the model to the locally saved scoring dataset csv. There must be data check steps and clear commenting for each step inside the .py file. The output for running this file is a csv file with the predicted score, as well as a png or text file output that contains the model accuracy report (e.g. sklearn's classification report or any other way of model evaluation).
 
-3. Critical Thinking (2 points total)
+3. Critical Thinking (2 points total)  
 Modify this ReadMe file to answer the following questions directly in place.  
    1) Kaggle changes links/ file locations/login process/ file content  
 
