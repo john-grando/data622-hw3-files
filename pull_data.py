@@ -75,7 +75,7 @@ def main():
         logger.info("download test file")
         get_kaggle_data(test_url, get_credentials(), 'test_data.csv')
     else:
-        logger.error("The credentials.txt file is missing, please add a credentials.txt file in the HiddenFiles folder as UserName,Password and uncomment the COPY HiddenFiles/credentials.txt line in the Dockerfile")
+        logger.error("The credentials.txt file is missing, please add a credentials.txt file in the HiddenFiles folder as UserName,Password and uncomment the COPY HiddenFiles/credentials.txt line in the Dockerfile (if using docker).")
         sys.exit()
     return
 
