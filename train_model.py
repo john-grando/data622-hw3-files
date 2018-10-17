@@ -163,7 +163,7 @@ def main():
         logger.info("Model training score: %s", round(train_score, 3))
         logger.info("Model test score: %s ", round(test_score, 3))
     else:
-        print("The training data file is missing")
+        logger.error("The training data file is missing")
         sys.exit()
     return
 
