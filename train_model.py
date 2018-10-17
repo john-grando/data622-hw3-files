@@ -1,4 +1,4 @@
-#DATA 622 Homework 2 - pull_data.py
+#DATA 622 Homework 2 - train_model.py
 #John Grando
 # -*- coding: utf-8 -*-
 
