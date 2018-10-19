@@ -9,7 +9,7 @@ WORKDIR /usr/src/app/hw2
 #I use a branch to mask my work before submittal as best as possible, as explained in the slack message I sent.
 RUN git checkout hw3
 #Temporary step for local testing, commented out for final submission.
-#COPY requirements.txt ./
+COPY requirements.txt ./
 #Required credential file that can optionally be copied in, if it's missing then continue and just let the program spit out the error
 #COPY HiddenFiles/credentials.txt ./HiddenFiles/credentials.txt
 RUN pip install --no-cache-dir -r requirements.txt
