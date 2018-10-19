@@ -94,7 +94,6 @@ def main():
     """
     #instantiate aws
     if len(sys.argv)>1:
-        print("a")
         if sys.argv[1] == 'remote':
             s3 = boto3.resource('s3',
                                 aws_access_key_id=os.environ['aws_access_key_id'],

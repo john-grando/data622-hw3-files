@@ -101,7 +101,7 @@ def main():
     """
      Get scoring data and test with a pre-made random forest model.  Print ouputs.
     """
-    try:
+    if len(sys.argv)>1:
         if sys.argv[1] == 'remote':
             s3 = boto3.resource('s3',
                                 aws_access_key_id=os.environ['aws_access_key_id'],
@@ -116,7 +116,7 @@ def main():
         else:
             logger.exception("Invalid argument")
             sys.exit(1)
-    except:
+    else:
         s3 = boto3.resource('s3')
         s3_r = boto3.client('s3')
     bucket='data622-hw3'
