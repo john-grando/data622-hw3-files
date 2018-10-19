@@ -2,7 +2,7 @@
 #John Grando
 # -*- coding: utf-8 -*-
 
-import os, sys, logging, logging.config, pickle
+import sys, logging, logging.config, pickle, boto3, tempfile
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import OneHotEncoder
@@ -16,7 +16,11 @@ from sklearn.metrics import classification_report
 #make logger a global variable
 logger = logging.getLogger('hw2Logger')
 
-def data_clean(file_loc, train_data = None):
+#instantiate aws
+s3 = boto3.resource('s3')
+s3_r = boto3.client('s3')
+
+def data_clean(bucket, key, train_data = None):
     """
     clean csv file and process it into a dataframe.  Return X and y objects.
     """
@@ -24,10 +28,11 @@ def data_clean(file_loc, train_data = None):
     y = None
     try:
         #Read in csv file
-        X = pd.read_csv(file_loc)
+        obj = s3_r.get_object(Bucket=bucket, Key=key)
+        X = pd.read_csv(obj['Body'])
     except:
-        logger.error("%s could not be read", file_loc)
-    logger.info("%s read", file_loc)
+        logger.exception("%s could not be read", key)
+    logger.info("%s read", key)
     try:
         if train_data:
             #Get response values for testing
@@ -88,7 +93,7 @@ def data_preprocess(X):
     logging.info("Training data transformation complete")
     return ct
 
-def create_randomforest(X, y, grid_search=None):
+def create_randomforest(bucket, X, y, grid_search=None):
     """
     Create random forest model and save to file
     """
@@ -143,9 +148,11 @@ def create_randomforest(X, y, grid_search=None):
         logger.error("Model could not be created")
         sys.exit(1)
     try:
-        #Save model to file
-        with open("RandomForestModel.pkl", 'wb') as f:
-            pickle.dump(rf_pipe, f)
+        #Save model to s3
+        with tempfile.NamedTemporaryFile() as temp:
+            pickle.dump(rf_pipe, temp)
+            temp.flush()
+            s3_r.upload_file(temp.name, bucket, 'RandomForestModel.pkl')
     except:
         logger.error("Model could not be saved to file but program will continue")
     return train_score, test_score, classification_report(y_train, rf_pipe.predict(X_train))
@@ -154,17 +161,22 @@ def main():
     """
     Get data and train a random forest model
     """
-    file_loc = os.path.join(os.getcwd(), "train_data.csv")
-    if os.path.isfile(file_loc):
+    bucket='data622-hw3'
+    try:
+        s3.Object(bucket, 'train_data.csv').load()
+        s3.Object(bucket, 'test_data.csv').load()
+    except:
+        logger.exception("files are missing from s3 instance, please rerun pull_data.py")
+        sys.exit(1)
+    try:
         logger.info("load training file and clean")
-        X_clean, y = data_clean(file_loc, train_data=True)
+        X_clean, y = data_clean(bucket, 'train_data.csv', train_data=True)
         logger.info("Create RandomForest model")
-        train_score, test_score, _ = create_randomforest(X_clean, y, grid_search=False)
+        train_score, test_score, _ = create_randomforest(bucket, X_clean, y, grid_search=False)
         logger.info("Model training score: %s", round(train_score, 3))
         logger.info("Model test score: %s ", round(test_score, 3))
-    else:
-        logger.error("The training data file is missing")
-        sys.exit()
+    except Exception:
+        logger.exception('Training model failed')
     return
 
 if __name__ == '__main__':

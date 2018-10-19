@@ -2,7 +2,7 @@
 #John Grando
 # -*- coding: utf-8 -*-
 
-import logging, logging.config, os, sys, pickle
+import logging, logging.config, os, sys, pickle, boto3, tempfile
 import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report
@@ -14,19 +14,25 @@ import train_model
 
 #make logger a global variable
 logger = logging.getLogger('hw2Logger')
+
+#instantiate aws
+s3 = boto3.resource('s3')
+s3_r = boto3.client('s3')
+
     
-def read_model(file_loc):
+def read_model(bucket, key):
    """
    Load model from pickle file
    """
    model = None
    try:
        #try to load the pickle file
-       with open(file_loc, 'rb') as f: 
-           model = pickle.load(f)
-   except:
-       logger.error("Model loading failed for %s", file_loc)
-       logger.info("Model loaded for %s", file_loc)
+       obj = s3_r.get_object(Bucket=bucket, Key=key)
+       model = pickle.loads(obj['Body'].read())
+   except Exception:
+       logger.exception("Model loading failed for %s", key)
+       sys.exit(1)
+   logger.info("Model loaded for %s", key)
    return model
 
 def score_set_transform(X):
@@ -42,65 +48,70 @@ def score_set_transform(X):
         logger.error("Test data could not be transformed")
     return X_transformed.fit_transform(X)
 
-def get_predictions(file_loc, model_file_loc):
+def get_predictions(bucket, file, model_file):
     """
     Make predictions using a saved model and test data
     """
     predictions = None
     model = None
-    if os.path.isfile(file_loc):
-        try:
-            #load data and make predictions
-            logger.info("Load test file and clean data")
-            X_clean, y = train_model.data_clean(file_loc)
-            logger.info("Load model")
-            model = read_model(model_file_loc)
-            logger.info("Test model")
-            predictions = model.predict(X_clean)
-            logger.info("Predictions completed")
-        except:
-            logger.error("Unable to make predictions based on the inputs")
-            sys.exit(1)
-    else:
-        logger.error("The testing data file is missing")
+    try:
+        #load data and make predictions
+        logger.info("Load test file and clean data")
+        X_clean, y = train_model.data_clean(bucket, file, train_data=False)
+        logger.info("Load model")
+        model = read_model(bucket, model_file)
+        logger.info("Test model")
+        predictions = model.predict(X_clean)
+        logger.info("Predictions completed")
+    except:
+        logger.error("Unable to make predictions based on the inputs")
         sys.exit(1)
     try:
         #Save predictions to csv file
-        input_df = pd.read_csv(file_loc)
-        pd.DataFrame(pd.concat([input_df['PassengerId'], pd.DataFrame(predictions)], axis=1, ignore_index=True)).rename(index=str, columns={0:'PassengerId', 1:'Survived'}).to_csv("Predictions.csv", index=False)
-    except:
-        logger.error("Unable to write predictions, program continuing")
+        obj = s3_r.get_object(Bucket=bucket, Key=file)
+        input_df = pd.read_csv(obj['Body'])
+        with tempfile.NamedTemporaryFile() as temp:
+            pd.DataFrame(pd.concat([input_df['PassengerId'], pd.DataFrame(predictions)], axis=1, ignore_index=True)).rename(index=str, columns={0:'PassengerId', 1:'Survived'}).to_csv(temp.name, index=False)
+            temp.flush()
+            s3_r.upload_file(temp.name, bucket, 'Predictions.csv')
+            
+    except Exception:
+        logger.exception("Unable to write predictions, program continuing")
     return predictions, model
 
-def get_reports(file_loc, model):
+def get_reports(bucket, key, model):
     """
     Generate reports for a model based on input file
     """
-    if os.path.isfile(file_loc):
-        try:
-            logger.info("load training file and clean")
-            X_clean, y = train_model.data_clean(file_loc, train_data=True)
-            cf_report = classification_report(y, model.predict(X_clean))
-            logger.info("Classification report for test data \n %s", cf_report)
-        except:
-            logger.error("classification report could not be generated")
-        with open("ClassificationReport.txt", 'w') as f:
-            f.write(cf_report)
-    else:
-        logger.error("Input file does not exist")
+    cf_report = None
+    try:
+        logger.info("load training file and clean")
+        X_clean, y = train_model.data_clean(bucket, key, train_data=True)
+        cf_report = classification_report(y, model.predict(X_clean))
+        logger.info("Classification report for test data \n %s", cf_report)
+        with tempfile.NamedTemporaryFile(mode='w') as temp:
+            temp.write(cf_report)
+            temp.flush()
+            s3_r.upload_file(temp.name, bucket, 'ClassificationReport.txt')
+    except Exception:
+        logger.exception("classification report could not be generated")
     return
 
 def main():
     """
      Get scoring data and test with a pre-made random forest model.  Print ouputs.
     """
-    file_loc = os.path.join(os.getcwd(), "test_data.csv")
-    model_file_loc = os.path.join(os.getcwd(),"RandomForestModel.pkl")
+    bucket='data622-hw3'
+    try:
+        s3.Object(bucket, 'train_data.csv').load()
+        s3.Object(bucket, 'test_data.csv').load()
+    except:
+        logger.exception("files are missing from s3 instance, please rerun pull_data.py")
+        sys.exit(1)
     #get predictions using the test data set
-    _, model = get_predictions(file_loc, model_file_loc)
+    _, model = get_predictions(bucket, 'test_data.csv', 'RandomForestModel.pkl')
     #get training data and print classification report
-    file_loc = os.path.join(os.getcwd(), "train_data.csv")
-    get_reports(file_loc, model)
+    get_reports(bucket, 'train_data.csv', model)
     return
 
 if __name__ == '__main__':
