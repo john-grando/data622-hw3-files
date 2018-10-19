@@ -2,7 +2,7 @@
 #John Grando
 # -*- coding: utf-8 -*-
 
-import sys, logging, logging.config, pickle, boto3, tempfile
+import os, sys, logging, logging.config, pickle, boto3, tempfile
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import OneHotEncoder
@@ -20,7 +20,7 @@ logger = logging.getLogger('hw2Logger')
 s3 = boto3.resource('s3')
 s3_r = boto3.client('s3')
 
-def data_clean(bucket, key, train_data = None):
+def data_clean(s3_r, bucket, key, train_data = None):
     """
     clean csv file and process it into a dataframe.  Return X and y objects.
     """
@@ -93,7 +93,7 @@ def data_preprocess(X):
     logging.info("Training data transformation complete")
     return ct
 
-def create_randomforest(bucket, X, y, grid_search=None):
+def create_randomforest(s3_r, bucket, X, y, grid_search=None):
     """
     Create random forest model and save to file
     """
@@ -161,6 +161,28 @@ def main():
     """
     Get data and train a random forest model
     """
+    print(sys.argv)
+    if sys.argv:
+        print("a")
+        if sys.argv[1] == 'remote':
+            print("b")
+            s3 = boto3.resource('s3',
+                                aws_access_key_id=os.environ['aws_access_key_id'],
+                                aws_secret_access_key=os.environ['aws_secret_access_key'],
+                                aws_session_token=os.environ['aws_session_token']
+                                )
+            s3_r = boto3.client('s3',
+                                aws_access_key_id=os.environ['aws_access_key_id'],
+                                aws_secret_access_key=os.environ['aws_secret_access_key'],
+                                aws_session_token=os.environ['aws_session_token']
+                                )
+        else:
+            logger.exception("Invalid argument")
+            sys.exit(1)
+    else:
+        print("c")
+        s3 = boto3.resource('s3')
+        s3_r = boto3.client('s3')
     bucket='data622-hw3'
     try:
         s3.Object(bucket, 'train_data.csv').load()
@@ -170,9 +192,9 @@ def main():
         sys.exit(1)
     try:
         logger.info("load training file and clean")
-        X_clean, y = data_clean(bucket, 'train_data.csv', train_data=True)
+        X_clean, y = data_clean(s3_r, bucket, 'train_data.csv', train_data=True)
         logger.info("Create RandomForest model")
-        train_score, test_score, _ = create_randomforest(bucket, X_clean, y, grid_search=False)
+        train_score, test_score, _ = create_randomforest(s3_r, bucket, X_clean, y, grid_search=False)
         logger.info("Model training score: %s", round(train_score, 3))
         logger.info("Model test score: %s ", round(test_score, 3))
     except Exception:

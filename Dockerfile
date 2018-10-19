@@ -3,7 +3,6 @@ FROM python:3.6
 RUN apt-get update && apt-get install -y
 
 WORKDIR /usr/src/app
-
 RUN git clone https://github.com/john-grando/hw2.git /usr/src/app/hw2
 WORKDIR /usr/src/app/hw2
 #I use a branch to mask my work before submittal as best as possible, as explained in the slack message I sent.

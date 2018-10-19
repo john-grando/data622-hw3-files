@@ -20,7 +20,7 @@ s3 = boto3.resource('s3')
 s3_r = boto3.client('s3')
 
     
-def read_model(bucket, key):
+def read_model(s3_r, bucket, key):
    """
    Load model from pickle file
    """
@@ -48,7 +48,7 @@ def score_set_transform(X):
         logger.error("Test data could not be transformed")
     return X_transformed.fit_transform(X)
 
-def get_predictions(bucket, file, model_file):
+def get_predictions(s3_r, bucket, file, model_file):
     """
     Make predictions using a saved model and test data
     """
@@ -57,9 +57,9 @@ def get_predictions(bucket, file, model_file):
     try:
         #load data and make predictions
         logger.info("Load test file and clean data")
-        X_clean, y = train_model.data_clean(bucket, file, train_data=False)
+        X_clean, y = train_model.data_clean(s3_r, bucket, file, train_data=False)
         logger.info("Load model")
-        model = read_model(bucket, model_file)
+        model = read_model(s3_r, bucket, model_file)
         logger.info("Test model")
         predictions = model.predict(X_clean)
         logger.info("Predictions completed")
@@ -79,14 +79,14 @@ def get_predictions(bucket, file, model_file):
         logger.exception("Unable to write predictions, program continuing")
     return predictions, model
 
-def get_reports(bucket, key, model):
+def get_reports(s3_r, bucket, key, model):
     """
     Generate reports for a model based on input file
     """
     cf_report = None
     try:
         logger.info("load training file and clean")
-        X_clean, y = train_model.data_clean(bucket, key, train_data=True)
+        X_clean, y = train_model.data_clean(s3_r, bucket, key, train_data=True)
         cf_report = classification_report(y, model.predict(X_clean))
         logger.info("Classification report for test data \n %s", cf_report)
         with tempfile.NamedTemporaryFile(mode='w') as temp:
@@ -101,6 +101,24 @@ def main():
     """
      Get scoring data and test with a pre-made random forest model.  Print ouputs.
     """
+    try:
+        if sys.argv[1] == 'remote':
+            s3 = boto3.resource('s3',
+                                aws_access_key_id=os.environ['aws_access_key_id'],
+                                aws_secret_access_key=os.environ['aws_secret_access_key'],
+                                aws_session_token=os.environ['aws_session_token']
+                                )
+            s3_r = boto3.client('s3',
+                                aws_access_key_id=os.environ['aws_access_key_id'],
+                                aws_secret_access_key=os.environ['aws_secret_access_key'],
+                                aws_session_token=os.environ['aws_session_token']
+                                )
+        else:
+            logger.exception("Invalid argument")
+            sys.exit(1)
+    except:
+        s3 = boto3.resource('s3')
+        s3_r = boto3.client('s3')
     bucket='data622-hw3'
     try:
         s3.Object(bucket, 'train_data.csv').load()
@@ -109,9 +127,9 @@ def main():
         logger.exception("files are missing from s3 instance, please rerun pull_data.py")
         sys.exit(1)
     #get predictions using the test data set
-    _, model = get_predictions(bucket, 'test_data.csv', 'RandomForestModel.pkl')
+    _, model = get_predictions(s3_r, bucket, 'test_data.csv', 'RandomForestModel.pkl')
     #get training data and print classification report
-    get_reports(bucket, 'train_data.csv', model)
+    get_reports(s3_r, bucket, 'train_data.csv', model)
     return
 
 if __name__ == '__main__':
