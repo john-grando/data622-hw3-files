@@ -3,12 +3,10 @@ FROM python:3.6
 RUN apt-get update && apt-get install -y
 
 WORKDIR /usr/src/app
-RUN git clone https://github.com/john-grando/hw2.git /usr/src/app/hw2
+RUN git clone https://github.com/john-grando/data622-hw3-files.git /usr/src/app/hw2
 WORKDIR /usr/src/app/hw2
-#Use the hw3 branch, which is ahead of the master
-RUN git pull origin hw3
 #Temporary step for local testing, commented out for final submission.
-COPY requirements.txt ./
+#COPY requirements.txt ./
 #Required credential file that can optionally be copied in, if it's missing then continue and just let the program spit out the error
 #COPY HiddenFiles/credentials.txt ./HiddenFiles/credentials.txt
 RUN pip install --no-cache-dir -r requirements.txt
